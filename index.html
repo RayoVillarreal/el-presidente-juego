@@ -166,14 +166,10 @@
                     <input type="number" id="generoDiversidad" min="0" value="0"
                            class="budget-input w-full p-2 border border-blue-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                 </div>
+                <!-- Ámbito unificado: Hábitat e Infraestructura -->
                 <div class="mb-4">
-                    <label for="habitat" class="block text-md font-medium text-gray-700 mb-1">Hábitat:</label>
-                    <input type="number" id="habitat" min="0" value="0"
-                           class="budget-input w-full p-2 border border-blue-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                </div>
-                <div class="mb-4">
-                    <label for="infraestructuraUrbana" class="block text-md font-medium text-gray-700 mb-1">Infraestructura Urbana:</label>
-                    <input type="number" id="infraestructuraUrbana" min="0" value="0"
+                    <label for="habitatInfraestructura" class="block text-md font-medium text-gray-700 mb-1">Hábitat e Infraestructura:</label>
+                    <input type="number" id="habitatInfraestructura" min="0" value="0"
                            class="budget-input w-full p-2 border border-blue-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                 </div>
                 <div class="mb-4">
@@ -186,14 +182,10 @@
                     <input type="number" id="politicasNinezJuventud" min="0" value="0"
                            class="budget-input w-full p-2 border border-blue-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                 </div>
+                <!-- Ámbito unificado: Adultos Mayores y Previsión Social -->
                 <div class="mb-4">
-                    <label for="politicasAdultosMayores" class="block text-md font-medium text-gray-700 mb-1">Políticas para Adultos Mayores:</label>
-                    <input type="number" id="politicasAdultosMayores" min="0" value="0"
-                           class="budget-input w-full p-2 border border-blue-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                </div>
-                <div class="mb-4">
-                    <label for="previsionSocial" class="block text-md font-medium text-gray-700 mb-1">Previsión Social:</label>
-                    <input type="number" id="previsionSocial" min="0" value="0"
+                    <label for="adultosMayoresPrevisionSocial" class="block text-md font-medium text-gray-700 mb-1">Adultos Mayores y Previsión Social:</label>
+                    <input type="number" id="adultosMayoresPrevisionSocial" min="0" value="0"
                            class="budget-input w-full p-2 border border-blue-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
                 </div>
                 <div class="mb-4">
@@ -260,6 +252,7 @@
         const allocatedBudgetSpan = document.getElementById('allocatedBudget');
         const budgetWarning = document.getElementById('budget-warning');
 
+        // Seleccionamos todos los inputs con la clase 'budget-input' para la Pregunta 4
         const budgetInputs = document.querySelectorAll('.budget-input');
         const submitButton = document.getElementById('submitButton');
         const confirmationMessage = document.getElementById('confirmationMessage');
@@ -317,26 +310,26 @@
             const presupuestoTotal = parseInt(presupuestoDisponibleSpan.textContent);
             let sumAllocated = 0;
 
-            // Sumar todos los valores asignados
-            budgetInputs.forEach(input => {
-                const value = parseInt(input.value) || 0; // Si el input está vacío, es 0
-                // Asegurarse de que ningún valor individual exceda el presupuesto total (aunque la suma es la validación principal)
-                if (value < 0) input.value = 0; // No permitir valores negativos
+            // Sumar todos los valores asignados de los inputs de presupuesto
+            // Usamos un selector general y luego filtramos para evitar duplicados si los IDs se usaran en otros lugares
+            document.querySelectorAll('.budget-input').forEach(input => {
+                const value = parseInt(input.value) || 0;
+                if (value < 0) input.value = 0;
                 sumAllocated += value;
             });
 
             const remainingBudget = presupuestoTotal - sumAllocated;
-            presupuestoRestanteSpan.textContent = Math.max(0, remainingBudget); // No mostrar presupuesto restante negativo
+            presupuestoRestanteSpan.textContent = Math.max(0, remainingBudget);
             allocatedBudgetSpan.textContent = sumAllocated;
 
             // Mostrar u ocultar la advertencia si se excede el presupuesto
             if (sumAllocated > presupuestoTotal) {
                 budgetWarning.classList.remove('hidden');
-                submitButton.disabled = true; // Deshabilitar botón de envío si se excede
+                submitButton.disabled = true;
                 submitButton.classList.add('opacity-50', 'cursor-not-allowed');
             } else {
                 budgetWarning.classList.add('hidden');
-                submitButton.disabled = false; // Habilitar botón
+                submitButton.disabled = false;
                 submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
             }
         }
@@ -353,17 +346,15 @@
                 presupuestoDisponibleTotal: parseInt(presupuestoDisponibleSpan.textContent),
                 nivelConsumo: parseInt(nivelConsumoSpan.textContent),
                 nivelInversiones: parseInt(nivelInversionesSpan.textContent),
-                // Datos de asignación de presupuesto
+                // Datos de asignación de presupuesto (NUEVOS CAMPOS)
                 cienciaTecnologia: parseInt(document.getElementById('cienciaTecnologia').value) || 0,
                 culturaDeportes: parseInt(document.getElementById('culturaDeportes').value) || 0,
                 educacion: parseInt(document.getElementById('educacion').value) || 0,
                 generoDiversidad: parseInt(document.getElementById('generoDiversidad').value) || 0,
-                habitat: parseInt(document.getElementById('habitat').value) || 0,
-                infraestructuraUrbana: parseInt(document.getElementById('infraestructuraUrbana').value) || 0,
+                habitatInfraestructura: parseInt(document.getElementById('habitatInfraestructura').value) || 0, // Unificado
                 politicaAmbiental: parseInt(document.getElementById('politicaAmbiental').value) || 0,
                 politicasNinezJuventud: parseInt(document.getElementById('politicasNinezJuventud').value) || 0,
-                politicasAdultosMayores: parseInt(document.getElementById('politicasAdultosMayores').value) || 0,
-                previsionSocial: parseInt(document.getElementById('previsionSocial').value) || 0,
+                adultosMayoresPrevisionSocial: parseInt(document.getElementById('adultosMayoresPrevisionSocial').value) || 0, // Unificado
                 salud: parseInt(document.getElementById('salud').value) || 0,
                 seguridad: parseInt(document.getElementById('seguridad').value) || 0,
                 subsidiosEmpresas: parseInt(document.getElementById('subsidiosEmpresas').value) || 0,
