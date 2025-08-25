@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El Presidente - Juego Interactivo</title>
+    <!-- Incluye Tailwind CSS para un estilo moderno y responsivo -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Un gris claro azulado */
+        }
+        /* Estilos personalizados para los sliders */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 10px;
+            background: #d1d5db; /* Gris medio */
+            outline: none;
+            opacity: 0.7;
+            transition: opacity .2s;
+            border-radius: 5px;
+        }
+
+        input[type="range"]:hover {
+            opacity: 1;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #4f46e5; /* Índigo */
+            cursor: pointer;
+            border-radius: 50%;
+            border: 2px solid #3730a3; /* Índigo más oscuro */
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #4f46e5; /* Índigo */
+            cursor: pointer;
+            border-radius: 50%;
+            border: 2px solid #3730a3; /* Índigo más oscuro */
+        }
+
+        /* Estilo para los inputs de presupuesto */
+        input[type="number"] {
+            -moz-appearance: textfield; /* Para Firefox */
+        }
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-6 md:p-8 lg:p-10 bg-gradient-to-br from-indigo-50 to-blue-100 min-h-screen flex items-center justify-center">
+    <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-xl max-w-4xl w-full border border-gray-200">
+        <h1 class="text-4xl sm:text-5xl font-extrabold text-center text-indigo-700 mb-6 sm:mb-8">
+            <span class="block">El Presidente</span>
+            <span class="block text-2xl sm:text-3xl font-semibold text-gray-500 mt-2">Simulador de Gobierno</span>
+        </h1>
+
+        <p class="text-gray-600 text-center mb-8 text-lg sm:text-xl leading-relaxed">
+            ¡Bienvenido! Toma las riendas del país y decide cómo gestionar los recursos. Tus decisiones impactarán en el presupuesto, el consumo y las inversiones. Ajusta las barras y observa las consecuencias.
+        </p>
+
+        <!-- Sección de Preguntas 1-3: Impuestos -->
+        <div class="mb-10 p-6 bg-indigo-50 rounded-xl shadow-inner border border-indigo-200">
+            <h2 class="text-3xl font-bold text-indigo-800 mb-6 border-b-2 border-indigo-300 pb-3">
+                1. Configuración Fiscal
+            </h2>
+
+            <!-- Pregunta 1: Presión Impositiva -->
+            <div class="mb-6">
+                <label for="presionImpositiva" class="block text-lg font-medium text-gray-700 mb-2">
+                    ¿Cuál es el nivel de presión impositiva que impondría durante su gobierno para recaudar Impuestos?
+                    (<span id="presionImpositivaValue" class="font-bold text-indigo-600">50%</span>)
+                </label>
+                <input type="range" id="presionImpositiva" min="0" max="100" value="50"
+                       class="w-full h-3 bg-indigo-200 rounded-lg appearance-none cursor-pointer range-lg">
+            </div>
+
+            <!-- Pregunta 2: Peso Impuestos Indirectos -->
+            <div class="mb-6">
+                <label for="impuestosIndirectos" class="block text-lg font-medium text-gray-700 mb-2">
+                    ¿Cuál sería el peso de los impuestos indirectos en su esquema impositivo? (Gravan actividades económicas y los pagan todos por igual).
+                    (<span id="impuestosIndirectosValue" class="font-bold text-indigo-600">50%</span>)
+                </label>
+                <input type="range" id="impuestosIndirectos" min="0" max="100" value="50"
+                       class="w-full h-3 bg-indigo-200 rounded-lg appearance-none cursor-pointer range-lg">
+            </div>
+
+            <!-- Pregunta 3: Peso Impuestos Directos -->
+            <div class="mb-6">
+                <label for="impuestosDirectos" class="block text-lg font-medium text-gray-700 mb-2">
+                    ¿Cuál sería el peso de los impuestos directos en su esquema impositivo? (Gravan el patrimonio y son progresivos, pagan más los más ricos).
+                    (<span id="impuestosDirectosValue" class="font-bold text-indigo-600">50%</span>)
+                </label>
+                <input type="range" id="impuestosDirectos" min="0" max="100" value="50"
+                       class="w-full h-3 bg-indigo-200 rounded-lg appearance-none cursor-pointer range-lg">
+            </div>
+        </div>
+
+        <!-- Sección de Resultados en Tiempo Real -->
+        <div class="mb-10 p-6 bg-emerald-50 rounded-xl shadow-inner border border-emerald-200">
+            <h2 class="text-3xl font-bold text-emerald-800 mb-6 border-b-2 border-emerald-300 pb-3">
+                Resultados de sus Decisiones
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                <div class="p-4 bg-white rounded-lg shadow-md border border-emerald-100">
+                    <p class="text-xl font-semibold text-gray-700">Presupuesto Disponible:</p>
+                    <p id="presupuestoDisponible" class="text-5xl font-extrabold text-emerald-600 mt-2">150</p>
+                    <p class="text-lg text-gray-500">pesos</p>
+                </div>
+                <div class="p-4 bg-white rounded-lg shadow-md border border-emerald-100">
+                    <p class="text-xl font-semibold text-gray-700">Nivel de Consumo:</p>
+                    <p id="nivelConsumo" class="text-5xl font-extrabold text-amber-600 mt-2">50</p>
+                    <p class="text-lg text-gray-500">puntos (0-100)</p>
+                </div>
+                <div class="p-4 bg-white rounded-lg shadow-md border border-emerald-100">
+                    <p class="text-xl font-semibold text-gray-700">Nivel de Inversiones:</p>
+                    <p id="nivelInversiones" class="text-5xl font-extrabold text-blue-600 mt-2">50</p>
+                    <p class="text-lg text-gray-500">puntos (0-100)</p>
+                </div>
+            </div>
+             <p id="budget-warning" class="text-red-600 text-center font-bold mt-4 hidden">
+                ¡Advertencia! El total asignado excede el presupuesto disponible.
+            </p>
+        </div>
+
+
+        <!-- Pregunta 4: Destino del Presupuesto -->
+        <div class="mb-10 p-6 bg-blue-50 rounded-xl shadow-inner border border-blue-200">
+            <h2 class="text-3xl font-bold text-blue-800 mb-6 border-b-2 border-blue-300 pb-3">
+                2. Asignación del Presupuesto
+            </h2>
+            <p class="text-gray-600 mb-4 text-lg">
+                Destine su presupuesto disponible (<span id="presupuestoRestante" class="font-bold text-blue-600">150</span> pesos restantes) a las siguientes áreas de gestión:
+            </p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="mb-4">
+                    <label for="cienciaTecnologia" class="block text-md font-medium text-gray-700 mb-1">Ciencia y Tecnología:</label>
+                    <input type="number" id="cienciaTecnologia" min="0" value="0"
+                           class="budget-input w-full p-2 border border-blue-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div class="mb-4">
+                    <label for="culturaDeportes" class="block text-md font-medium text-gray-700 mb-1">Cultura y Deportes:</label>
+                    <input type="number" id="culturaDeportes" min="0" value="0"
+                           class="budget-input w-full p-2 border border-blue-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div class="mb-4">
+                    <label for="educacion" class="block text-md font-medium text-gray-700 mb-1">Educación:</label>
+                    <input type="number" id="educacion" min="0" value="0"
+                           class="budget-input w-full p-2 border border-blue-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div class="mb-4">
+                    <label for="generoDiversidad" class="block text-md font-medium text-gray-700 mb-1">Género y Diversidad:</label>
+                    <input type="number" id="generoDiversidad" min="0" value="0"
+                           class="budget-input w-full p-2 border border-blue-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div class="mb-4">
+                    <label for="habitat" class="block text-md font-medium text-gray-700 mb-1">Hábitat:</label>
+                    <input type="number" id="habitat" min="0" value="0"
+                           class="budget-input w-full p-2 border border-blue-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div class="mb-4">
+                    <label for="infraestructuraUrbana" class="block text-md font-medium text-gray-700 mb-1">Infraestructura Urbana:</label>
+                    <input type="number" id="infraestructuraUrbana" min="0" value="0"
+                           class="budget-input w-full p-2 border border-blue-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div class="mb-4">
+                    <label for="politicaAmbiental" class="block text-md font-medium text-gray-700 mb-1">Política Ambiental:</label>
+                    <input type="number" id="politicaAmbiental" min="0" value="0"
+                           class="budget-input w-full p-2 border border-blue-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div class="mb-4">
+                    <label for="politicasNinezJuventud" class="block text-md font-medium text-gray-700 mb-1">Políticas para la Niñez y la Juventud:</label>
+                    <input type="number" id="politicasNinezJuventud" min="0" value="0"
+                           class="budget-input w-full p-2 border border-blue-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div class="mb-4">
+                    <label for="politicasAdultosMayores" class="block text-md font-medium text-gray-700 mb-1">Políticas para Adultos Mayores:</label>
+                    <input type="number" id="politicasAdultosMayores" min="0" value="0"
+                           class="budget-input w-full p-2 border border-blue-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div class="mb-4">
+                    <label for="previsionSocial" class="block text-md font-medium text-gray-700 mb-1">Previsión Social:</label>
+                    <input type="number" id="previsionSocial" min="0" value="0"
+                           class="budget-input w-full p-2 border border-blue-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div class="mb-4">
+                    <label for="salud" class="block text-md font-medium text-gray-700 mb-1">Salud:</label>
+                    <input type="number" id="salud" min="0" value="0"
+                           class="budget-input w-full p-2 border border-blue-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div class="mb-4">
+                    <label for="seguridad" class="block text-md font-medium text-gray-700 mb-1">Seguridad:</label>
+                    <input type="number" id="seguridad" min="0" value="0"
+                           class="budget-input w-full p-2 border border-blue-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div class="mb-4">
+                    <label for="subsidiosEmpresas" class="block text-md font-medium text-gray-700 mb-1">Subsidios a Empresas:</label>
+                    <input type="number" id="subsidiosEmpresas" min="0" value="0"
+                           class="budget-input w-full p-2 border border-blue-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div class="mb-4">
+                    <label for="trabajoSeguridadSocial" class="block text-md font-medium text-gray-700 mb-1">Trabajo y Seguridad Social:</label>
+                    <input type="number" id="trabajoSeguridadSocial" min="0" value="0"
+                           class="budget-input w-full p-2 border border-blue-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+            </div>
+            <p id="budget-sum-message" class="text-gray-600 text-center mt-4">
+                Total asignado: <span id="allocatedBudget" class="font-bold text-blue-600">0</span> pesos.
+            </p>
+
+            <!-- Mensaje de confirmación (oculto por defecto) -->
+            <div id="confirmationMessage" class="hidden fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center p-4">
+                <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">¡Gracias por participar!</h3>
+                    <p class="text-gray-600 mb-6">Tus decisiones han sido registradas.</p>
+                    <button id="closeConfirmation" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Botón de Envío -->
+        <div class="text-center mt-8">
+            <button id="submitButton"
+                    class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-full text-xl shadow-lg transform transition duration-300 hover:scale-105">
+                Listo
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Obtención de referencias a los elementos del DOM
+        const presionImpositivaSlider = document.getElementById('presionImpositiva');
+        const impuestosIndirectosSlider = document.getElementById('impuestosIndirectos');
+        const impuestosDirectosSlider = document.getElementById('impuestosDirectos');
+
+        const presionImpositivaValueSpan = document.getElementById('presionImpositivaValue');
+        const impuestosIndirectosValueSpan = document.getElementById('impuestosIndirectosValue');
+        const impuestosDirectosValueSpan = document.getElementById('impuestosDirectosValue');
+
+        const presupuestoDisponibleSpan = document.getElementById('presupuestoDisponible');
+        const nivelConsumoSpan = document.getElementById('nivelConsumo');
+        const nivelInversionesSpan = document.getElementById('nivelInversiones');
+        const presupuestoRestanteSpan = document.getElementById('presupuestoRestante');
+        const allocatedBudgetSpan = document.getElementById('allocatedBudget');
+        const budgetWarning = document.getElementById('budget-warning');
+
+        const budgetInputs = document.querySelectorAll('.budget-input');
+        const submitButton = document.getElementById('submitButton');
+        const confirmationMessage = document.getElementById('confirmationMessage');
+        const closeConfirmationButton = document.getElementById('closeConfirmation');
+
+        // URL del Google Apps Script (¡DEBES ACTUALIZAR ESTO CON LA TUYA!)
+        // Sigue las instrucciones a continuación para obtener esta URL
+        const GOOGLE_APPS_SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE';
+
+        /**
+         * Calcula y actualiza los valores de presupuesto disponible, consumo e inversiones.
+         */
+        function updateResults() {
+            // Obtener valores de los sliders
+            const presionImpositiva = parseInt(presionImpositivaSlider.value);
+            const impuestosIndirectos = parseInt(impuestosIndirectosSlider.value);
+            const impuestosDirectos = parseInt(impuestosDirectosSlider.value);
+
+            // Actualizar valores mostrados al lado de los sliders
+            presionImpositivaValueSpan.textContent = `${presionImpositiva}%`;
+            impuestosIndirectosValueSpan.textContent = `${impuestosIndirectos}%`;
+            impuestosDirectosValueSpan.textContent = `${impuestosDirectos}%`;
+
+            // Calcular Presupuesto Disponible (máximo 200) - Lógica sin cambios
+            let presupuesto = presionImpositiva; // 0-100 pesos de Q1
+            presupuesto += (impuestosIndirectos / 100) * 50; // 0-50 adicionales de Q2
+            presupuesto += (impuestosDirectos / 100) * 50;   // 0-50 adicionales de Q3
+            presupuesto = Math.round(presupuesto); // Redondear a número entero
+
+            // Calcular Nivel de Consumo (0-100) - Lógica NUEVA
+            // La suma máxima de presionImpositiva e impuestosIndirectos es 100 + 100 = 200.
+            // Si la suma es 0, el consumo es 100. Si la suma es 200, el consumo es 0.
+            const sumConsumoInputs = presionImpositiva + impuestosIndirectos;
+            const nivelConsumo = Math.round(100 - (sumConsumoInputs / 200) * 100);
+            
+            // Calcular Nivel de Inversiones (0-100) - Lógica NUEVA
+            // La suma máxima de presionImpositiva e impuestosDirectos es 100 + 100 = 200.
+            // Si la suma es 0, las inversiones son 100. Si la suma es 200, las inversiones son 0.
+            const sumInversionesInputs = presionImpositiva + impuestosDirectos;
+            const nivelInversiones = Math.round(100 - (sumInversionesInputs / 200) * 100);
+
+            // Actualizar los elementos del DOM con los nuevos valores
+            presupuestoDisponibleSpan.textContent = presupuesto;
+            nivelConsumoSpan.textContent = nivelConsumo;
+            nivelInversionesSpan.textContent = nivelInversiones;
+
+            // Actualizar el presupuesto restante para la pregunta 4
+            updateBudgetAllocation();
+        }
+
+        /**
+         * Actualiza el presupuesto restante para la asignación de áreas y valida la suma.
+         */
+        function updateBudgetAllocation() {
+            const presupuestoTotal = parseInt(presupuestoDisponibleSpan.textContent);
+            let sumAllocated = 0;
+
+            // Sumar todos los valores asignados
+            budgetInputs.forEach(input => {
+                const value = parseInt(input.value) || 0; // Si el input está vacío, es 0
+                // Asegurarse de que ningún valor individual exceda el presupuesto total (aunque la suma es la validación principal)
+                if (value < 0) input.value = 0; // No permitir valores negativos
+                sumAllocated += value;
+            });
+
+            const remainingBudget = presupuestoTotal - sumAllocated;
+            presupuestoRestanteSpan.textContent = Math.max(0, remainingBudget); // No mostrar presupuesto restante negativo
+            allocatedBudgetSpan.textContent = sumAllocated;
+
+            // Mostrar u ocultar la advertencia si se excede el presupuesto
+            if (sumAllocated > presupuestoTotal) {
+                budgetWarning.classList.remove('hidden');
+                submitButton.disabled = true; // Deshabilitar botón de envío si se excede
+                submitButton.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                budgetWarning.classList.add('hidden');
+                submitButton.disabled = false; // Habilitar botón
+                submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        /**
+         * Envía los datos recolectados al Google Apps Script.
+         */
+        async function submitData() {
+            // Recolectar todos los datos del juego
+            const data = {
+                presionImpositiva: parseInt(presionImpositivaSlider.value),
+                impuestosIndirectos: parseInt(impuestosIndirectosSlider.value),
+                impuestosDirectos: parseInt(impuestosDirectosSlider.value),
+                presupuestoDisponibleTotal: parseInt(presupuestoDisponibleSpan.textContent),
+                nivelConsumo: parseInt(nivelConsumoSpan.textContent),
+                nivelInversiones: parseInt(nivelInversionesSpan.textContent),
+                // Datos de asignación de presupuesto
+                cienciaTecnologia: parseInt(document.getElementById('cienciaTecnologia').value) || 0,
+                culturaDeportes: parseInt(document.getElementById('culturaDeportes').value) || 0,
+                educacion: parseInt(document.getElementById('educacion').value) || 0,
+                generoDiversidad: parseInt(document.getElementById('generoDiversidad').value) || 0,
+                habitat: parseInt(document.getElementById('habitat').value) || 0,
+                infraestructuraUrbana: parseInt(document.getElementById('infraestructuraUrbana').value) || 0,
+                politicaAmbiental: parseInt(document.getElementById('politicaAmbiental').value) || 0,
+                politicasNinezJuventud: parseInt(document.getElementById('politicasNinezJuventud').value) || 0,
+                politicasAdultosMayores: parseInt(document.getElementById('politicasAdultosMayores').value) || 0,
+                previsionSocial: parseInt(document.getElementById('previsionSocial').value) || 0,
+                salud: parseInt(document.getElementById('salud').value) || 0,
+                seguridad: parseInt(document.getElementById('seguridad').value) || 0,
+                subsidiosEmpresas: parseInt(document.getElementById('subsidiosEmpresas').value) || 0,
+                trabajoSeguridadSocial: parseInt(document.getElementById('trabajoSeguridadSocial').value) || 0,
+            };
+
+            // Validar que el URL del Apps Script esté configurado
+            if (GOOGLE_APPS_SCRIPT_URL === 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE' || !GOOGLE_APPS_SCRIPT_URL) {
+                console.error("Error: La URL de Google Apps Script no está configurada. Por favor, sigue las instrucciones.");
+                alert("Error: Por favor, configura la URL de Google Apps Script para enviar los datos.");
+                return;
+            }
+
+            try {
+                // Envío de datos al Google Apps Script
+                const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // Necesario para evitar problemas de CORS con Apps Script
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data) // Convertir el objeto de datos a JSON
+                });
+
+                // Aunque 'no-cors' no permite leer la respuesta, si el fetch se completa sin error, asumimos éxito.
+                console.log('Datos enviados correctamente (se asume).');
+                confirmationMessage.classList.remove('hidden'); // Mostrar mensaje de confirmación
+                // Limpiar inputs después de enviar (opcional)
+                budgetInputs.forEach(input => input.value = 0);
+                presionImpositivaSlider.value = 50;
+                impuestosIndirectosSlider.value = 50;
+                impuestosDirectosSlider.value = 50;
+                updateResults(); // Restablecer la UI
+            } catch (error) {
+                console.error('Error al enviar los datos:', error);
+                alert('Hubo un error al enviar los datos. Inténtalo de nuevo.');
+            }
+        }
+
+        // --- Listeners de Eventos ---
+
+        // Sliders de preguntas 1-3
+        presionImpositivaSlider.addEventListener('input', updateResults);
+        impuestosIndirectosSlider.addEventListener('input', updateResults);
+        impuestosDirectosSlider.addEventListener('input', updateResults);
+
+        // Inputs de la pregunta 4 (asignación de presupuesto)
+        budgetInputs.forEach(input => {
+            input.addEventListener('input', updateBudgetAllocation);
+        });
+
+        // Botón "Listo" para enviar datos
+        submitButton.addEventListener('click', submitData);
+
+        // Botón para cerrar el mensaje de confirmación
+        closeConfirmationButton.addEventListener('click', () => {
+            confirmationMessage.classList.add('hidden');
+        });
+
+        // Inicializar los resultados al cargar la página
+        window.onload = () => {
+            updateResults();
+        };
+
+    </script>
+</body>
+</html>
